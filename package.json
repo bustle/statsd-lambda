@@ -1,6 +1,6 @@
 {
   "name": "statsd-lambda",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A simple UDP based statsd client designed for functions as a service",
   "main": "dist/index.js",
   "module": "dist/index-esm.js",

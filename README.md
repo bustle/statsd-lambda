@@ -2,11 +2,34 @@
 
 [![Build Status](https://travis-ci.org/reconbot/statsd-lambda.svg?branch=master)](https://travis-ci.org/reconbot/statsd-lambda) [![Try streaming-iterables on RunKit](https://badge.runkitcdn.com/statsd-lambda.svg)](https://npm.runkit.com/statsd-lambda) [![install size](https://packagephobia.now.sh/badge?p=statsd-lambda)](https://packagephobia.now.sh/result?p=statsd-lambda)
 
-A simple UDP based statsd client designed for functions as a service. Leverages the microtask queue to batch metrics messages and sends them out via UDP for a very cheap way to collect counters, gauges, and timers that wont block your responses.
+A simple UDP based statsd client designed for Amazon Lambda. (And is probably useful for other functions as a service.) It leverages the microtask queue to batch metrics messages and sends them out via UDP for a very cheap way to collect counters, gauges, and timers that wont block your responses.
 
-Many statsd clients exist and if you're not using lambda you should look at them and choose one. However on lambda (and other functions as a service) once you've responded to a request your function is put to sleep and you never know when the data will be sent. To work around this `statsd-lambda` queues sending metrics using `process.nextTick` which is fired after promises resolve and before the next event loop. (Tested in node 8+ and node 11+.)
+- Overview
+  - [Why another statsd client?](#why-another-statsd-client)
+  - [Why statsd vs a service?](#why-statsd-vs-a-hosted-service)
+  - [Install](#install)
+  - [Contributors wanted](#contributors-wanted)
+- API
+  - [`constructor()`](#constructor)
+  - [`close()`](#close)
+  - [`counter()`](#counter)
+  - [`flush()`](#flush)
+  - [`gauge()`](#gauge)
+  - [`timer()`](#timer)
+  - [`MockTransport()`](#MockTransport)
+  - [`UDPTransport`](#UDPTransport)
 
-This has proven to submit the packets to be sent over UDP before the lambda is put to sleep at a low scale (high scale testing is forthcoming). If you want to be sure the metrics send immediately you can manually flush the cache before your function resolves.
+
+## Why another statsd client?
+
+Many statsd clients exist and if you're not using lambda you should consider them. However on amazon lambda once you've responded to a request your function is put to sleep preventing background tasks from executing. Most stats libraries use a background task or send metrics data which will be unpredictable. Most lambda specific libraries will block your response to send metrics over https slowing down your process which is unnecessary. To report stats data without leveraging background task queues or slowing down your response `statsd-lambda` queues sending metrics using `process.nextTick` which is fired after promises resolve and before the next event loop. This allows the very fast process of sending UDP packets to complete
+
+This has proven to reliably report metrics with a low impact (0-2 ms).
+
+## Why statsd vs a hosted service?
+There are currently no UDP based hosted services. Every single service I have found blocks your lambda's response with an https request that can take anywhere from 10-300ms to complete (this includes Cloudwatch metrics which has pretty harsh rate limiting). With one exception, Amazon's X-Ray, which isn't suitable for metric collection.
+
+That aside (and it's a big aside) every hosted solution is significantly more money than a self hosted solution. So while Lambda has brought in an era of reduced operations, it hasn't eliminated all of it.
 
 ## Install
 There are no dependencies.
@@ -18,14 +41,6 @@ npm install statsd-lambda
 We ship esm, umd (with the AMD global `streamingIterables`) and typescript types.
 
 ## API
-- [`constructor()`](#constructor)
-- [`close()`](#close)
-- [`counter()`](#counter)
-- [`flush()`](#flush)
-- [`gauge()`](#gauge)
-- [`timer()`](#timer)
-- [`MockTransport()`](#MockTransport)
-- [`UDPTransport`](#UDPTransport)
 
 ### constructor
 ```ts
@@ -189,7 +204,7 @@ class MockTransport implements IStatsTransport {
 }
 ```
 
-`MockTransport` is an `IStatsTransport` conforming transport that does nothing but buffer the packets to be sent up to `maxBuffer` (default is 100). This is helpful for testing.
+`MockTransport` is an `IStatsTransport` conforming transport that does nothing but store the packets to be sent as strings up to `maxBuffer` (default is 100). This is helpful for testing.
 
 ```ts
 import { MockTransport, MetricsClient } from 'statsd-lambda'
@@ -200,11 +215,11 @@ const client = new MetricsClient({
 })
 
 client.counter('test.count', 1)
+client.counter('test.count', 3)
 client.flush()
 console.log(transport.packets)
-// [Buffer.from("pokedex.production.test.count:1|c")]
+// ["pokedex.production.test.count:4|c"]
 ```
-
 
 ### UDPTransport
 ```ts
@@ -231,4 +246,4 @@ client.flush()
 
 ## Contributors wanted!
 
-Writing docs and code is a lot of work! Thank you in advance for helping out.
+This library was developed at Bustle. However writing docs and code is a lot of work! Thank you in advance for helping out and keeping projects like this open source.

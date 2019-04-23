@@ -1,0 +1,32 @@
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+version: 2.1
+
+jobs:
+  node8:
+    docker:
+    - image: circleci/node:8
+    steps:
+      - checkout
+      - run: npm ci
+      - run: npm test
+  node10:
+    docker:
+    - image: circleci/node:10
+    steps:
+      - checkout
+      - run: npm ci
+      - run: npm test
+  node11:
+    docker:
+    - image: circleci/node:11
+    steps:
+      - checkout
+      - run: npm ci
+      - run: npm test
+
+workflows:
+  test:
+    jobs:
+      - node8
+      - node10
+      - node11

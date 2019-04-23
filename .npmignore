@@ -1,5 +1,5 @@
 .gitignore
-.travis.yml
+.circleci
 .vscode
 lib
 package-lock.json

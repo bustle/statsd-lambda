@@ -7,6 +7,7 @@ A simple UDP based statsd client designed for Amazon Lambda. (And is probably us
 - Overview
   - [Why another statsd client?](#why-another-statsd-client)
   - [Why statsd vs a service?](#why-statsd-vs-a-hosted-service)
+  - [Security](#security)
   - [Install](#install)
   - [Contributors wanted](#contributors-wanted)
 - API
@@ -30,6 +31,9 @@ This has proven to reliably report metrics with a low impact (0-2 ms).
 There are currently no UDP based hosted services. Every single service I have found blocks your lambda's response with an https request that can take anywhere from 10-300ms to complete (this includes Cloudwatch metrics which has pretty harsh rate limiting). With one exception, Amazon's X-Ray, which isn't suitable for metric collection.
 
 That aside (and it's a big aside) every hosted solution is significantly more money than a self hosted solution. So while Lambda has brought in an era of reduced operations, it hasn't eliminated all of it.
+
+## Security
+`statsd` doesn't provide any security. It uses an unencrypted plain text UDP protocol. This isn't a problem if you're in a VPC. However if you're not running in a vpc you should know that the metric traffic could be intercepted by any network between your lambda and your statsd server. If you're running a `statsd` server in AWS then there's a low risk of anyone other than AWS seeing your metrics but there's no guarantee.
 
 ## Install
 There are no dependencies.

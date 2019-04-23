@@ -1,6 +1,6 @@
 # statsd-lambda 🔨
 
-[![Build Status](https://travis-ci.org/reconbot/statsd-lambda.svg?branch=master)](https://travis-ci.org/reconbot/statsd-lambda) [![Try streaming-iterables on RunKit](https://badge.runkitcdn.com/statsd-lambda.svg)](https://npm.runkit.com/statsd-lambda) [![install size](https://packagephobia.now.sh/badge?p=statsd-lambda)](https://packagephobia.now.sh/result?p=statsd-lambda)
+[![CircleCI](https://circleci.com/gh/bustle/statsd-lambda/tree/master.svg?style=svg)](https://circleci.com/gh/bustle/statsd-lambda/tree/master) [![Try streaming-iterables on RunKit](https://badge.runkitcdn.com/statsd-lambda.svg)](https://npm.runkit.com/statsd-lambda) [![install size](https://packagephobia.now.sh/badge?p=statsd-lambda)](https://packagephobia.now.sh/result?p=statsd-lambda)
 
 A simple UDP based statsd client designed for Amazon Lambda. (And is probably useful for other functions as a service.) It leverages the microtask queue to batch metrics messages and sends them out via UDP for a very cheap way to collect counters, gauges, and timers that wont block your responses.
 

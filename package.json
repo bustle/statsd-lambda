@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "module": "dist/index-esm.js",
   "types": "dist/index.d.ts",
-  "repository": "git@github.com:reconbot/statsd-lambda.git",
-  "homepage": "https://github.com/reconbot/statsd-lambda",
+  "repository": "git@github.com:bustle/statsd-lambda.git",
+  "homepage": "https://github.com/bustle/statsd-lambda",
   "runkitExampleFilename": "example.js",
   "scripts": {
     "test": "npm run unit-test && npm run lint",

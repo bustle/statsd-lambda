@@ -11,6 +11,7 @@ export class UDPTransport implements IStatsTransport {
     this.host = host
     this.port = port
     this.socket = createSocket('udp4')
+    this.socket.on('error', () => this.close())
     this.closed = false
   }
 
@@ -18,7 +19,11 @@ export class UDPTransport implements IStatsTransport {
     if (this.closed) {
       throw new Error('socket is closed cannot send data')
     }
-    this.socket.send(data, this.port, this.host)
+    try {
+      this.socket.send(data, this.port, this.host)
+    } catch {
+      this.close()
+    }
   }
 
   public close() {
